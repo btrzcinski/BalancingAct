@@ -11,6 +11,15 @@ import {SerializerService} from './serializer.service';
   styleUrls: ['./portfolio.component.css']
 })
 export class PortfolioComponent implements OnInit {
+  get holdings(): HoldingModel[] {
+    return this._holdings;
+  }
+
+  @Input()
+  set holdings(value: HoldingModel[]) {
+    this._holdings = value;
+    this.updatePermalink();
+  }
 
   constructor(private quoteService: QuoteService,
               private serializerService: SerializerService,
@@ -20,8 +29,8 @@ export class PortfolioComponent implements OnInit {
     );
   }
 
-  @Input()
-  public holdings: HoldingModel[] = new Array<HoldingModel>();
+  // tslint:disable-next-line:variable-name
+  private _holdings: HoldingModel[] = new Array<HoldingModel>();
 
   @Input()
   public editable: boolean;
@@ -51,8 +60,8 @@ export class PortfolioComponent implements OnInit {
   }
 
   addHolding(): void {
-    this.holdings.push(new HoldingModel(
-      this.holdings,
+    this._holdings.push(new HoldingModel(
+      this._holdings,
       this.newHoldingForm.get('symbol').value.toUpperCase(),
       +this.newHoldingForm.get('targetAllocation').value * .01,
       this.newHoldingForm.get('sellToBalance').value,
@@ -65,16 +74,16 @@ export class PortfolioComponent implements OnInit {
   }
 
   updatePermalink() {
-    this.permalink = '/balancingAct?holdings=' + this.serializerService.serializeHoldings(this.holdings);
+    this.permalink = '/balancingAct?holdings=' + this.serializerService.serializeHoldings(this._holdings);
   }
 
   removeHolding(holdingIndex: number): void {
-    this.newHoldingForm.get('symbol').setValue(this.holdings[holdingIndex].symbol);
+    this.newHoldingForm.get('symbol').setValue(this._holdings[holdingIndex].symbol);
     this.newHoldingForm.get('targetAllocation').setValue(
-      Math.round(this.holdings[holdingIndex].targetAllocation * 100));
-    this.newHoldingForm.get('sellToBalance').setValue(this.holdings[holdingIndex].sellToBalance);
-    this.newHoldingForm.get('quantity').setValue(this.holdings[holdingIndex].quantity);
-    this.holdings.splice(holdingIndex, 1);
+      Math.round(this._holdings[holdingIndex].targetAllocation * 100));
+    this.newHoldingForm.get('sellToBalance').setValue(this._holdings[holdingIndex].sellToBalance);
+    this.newHoldingForm.get('quantity').setValue(this._holdings[holdingIndex].quantity);
+    this._holdings.splice(holdingIndex, 1);
     this.updatePermalink();
     this.symbolInput.nativeElement.focus();
   }
@@ -91,7 +100,6 @@ export class PortfolioComponent implements OnInit {
   private updateHoldingsFromQueryParams(params: Params) {
     if (params.holdings) {
       this.holdings = this.serializerService.deserializeHoldings(params.holdings);
-      this.updatePermalink();
     }
   }
 }

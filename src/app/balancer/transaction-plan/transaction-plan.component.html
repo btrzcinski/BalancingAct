@@ -2,10 +2,12 @@
   <ng-container *ngFor="let holding of newHoldings; let i = index">
     <ng-container *ngIf="holding.symbol != 'CASH'">
       <li *ngIf="holding.quantity - oldHoldings[i].quantity > 0">
-        <span class="buy">Buy</span> {{ holding.quantity - oldHoldings[i].quantity }} shares of {{ holding.symbol }}
+        <span class="buy">Buy</span> {{ holding.quantity - oldHoldings[i].quantity }}
+        shares of <strong>{{ holding.symbol }}</strong>
       </li>
       <li *ngIf="holding.quantity - oldHoldings[i].quantity < 0">
-        <span class="sell">Sell</span> {{ oldHoldings[i].quantity - holding.quantity }} shares of {{ holding.symbol }}
+        <span class="sell">Sell</span> {{ oldHoldings[i].quantity - holding.quantity }}
+        shares of <strong>{{ holding.symbol }}</strong>
       </li>
     </ng-container>
   </ng-container>
