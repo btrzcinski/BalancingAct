@@ -25,6 +25,7 @@ export class QuoteService {
 
     // In development mode, return fixed prices for known test securities to avoid hitting the API so much.
     if (!environment.production) {
+      console.log(`QuoteService: Not running in production, using fake prices for '${symbol}'`);
       switch (symbol.toUpperCase()) {
         case 'BND': return of(85.96);
         case 'BNDX': return of(56.15);

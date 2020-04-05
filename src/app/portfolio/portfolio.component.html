@@ -13,19 +13,21 @@
     <th *ngIf="editable">Action</th>
   </tr>
 
-  <tr *ngFor="let holding of holdings; let i = index">
-    <td>{{ holding.symbol }}</td>
-    <td>{{ holding.targetAllocation | percent }}</td>
-    <td><input type="checkbox" [checked]="holding.sellToBalance" disabled></td>
-    <td>{{ holding.quantity }}</td>
-    <td>{{ holding.price | currency }}</td>
-    <td>{{ holding.amount | currency }}</td>
-    <td><span [ngClass]="{'buy': holding.distanceToTargetAllocation < 0,
+  <ng-container *ngFor="let holding of holdings; let i = index">
+    <tr [ngClass]="{'odd-row': i % 2 === 1}">
+      <td>{{ holding.symbol }}</td>
+      <td>{{ holding.targetAllocation | percent }}</td>
+      <td><input type="checkbox" [checked]="holding.sellToBalance" disabled></td>
+      <td>{{ holding.quantity }}</td>
+      <td>{{ holding.price | currency }}</td>
+      <td>{{ holding.amount | currency }}</td>
+      <td><span [ngClass]="{'buy': holding.distanceToTargetAllocation < 0,
                     'sell': holding.distanceToTargetAllocation > 0}">
       {{ holding.distanceToTargetAllocation | percent:'1.2-3' }}
     </span></td>
-    <td *ngIf="editable"><input type="button" value="Edit/Remove" (click)="removeHolding(i)"></td>
-  </tr>
+      <td *ngIf="editable"><input type="button" value="Edit/Remove" (click)="removeHolding(i)"></td>
+    </tr>
+  </ng-container>
 
   <tr *ngIf="editable">
     <td><input #symbolInput type="text" formControlName="symbol"></td>

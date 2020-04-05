@@ -100,6 +100,11 @@ export class PortfolioComponent implements OnInit {
   private updateHoldingsFromQueryParams(params: Params) {
     if (params.holdings) {
       this.holdings = this.serializerService.deserializeHoldings(params.holdings);
+      this.updatePrices();
     }
+  }
+
+  private updatePrices() {
+    this.holdings.forEach(h => this.quoteService.getQuote(h.symbol).subscribe(quote => h.price = quote));
   }
 }

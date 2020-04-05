@@ -25,7 +25,6 @@ export class HoldingModel {
     const currentAbsDistance = Math.abs(this.distanceToTargetAllocation);
     const proposedAbsDistance = Math.abs(
       ((this.price * proposedHoldingQuantity) / this.getPortfolioTotal()) - this.targetAllocation);
-    console.log(`${this.symbol}: Proposed quantity = ${proposedHoldingQuantity}, abs distance = ${currentAbsDistance}, proposed abs distance = ${proposedAbsDistance}`);
     return proposedAbsDistance >= currentAbsDistance;
   }
 
