@@ -1,0 +1,7 @@
+<p>Total target allocation: {{ totalTargetAllocation | percent }}</p>
+<ng-container *ngIf="totalTargetAllocation === 1">
+  <h2>Transaction Plan</h2>
+  <balancer-transaction-plan [oldHoldings]="holdings" [newHoldings]="balancedHoldings"></balancer-transaction-plan>
+  <h2>New Portfolio</h2>
+  <app-portfolio  [holdings]="balancedHoldings"></app-portfolio>
+</ng-container>

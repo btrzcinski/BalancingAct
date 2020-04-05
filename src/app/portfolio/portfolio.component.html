@@ -1,0 +1,43 @@
+<p><a [href]="permalink">Permalink</a></p>
+
+<form [formGroup]="newHoldingForm" (ngSubmit)="addHolding()">
+<table>
+  <tr>
+    <th>Symbol</th>
+    <th>Target Alloc.</th>
+    <th>Sell to Bal.</th>
+    <th>Quantity</th>
+    <th>Price</th>
+    <th>Amount</th>
+    <th>Dist. to Tgt.</th>
+    <th *ngIf="editable">Action</th>
+  </tr>
+
+  <tr *ngFor="let holding of holdings; let i = index">
+    <td>{{ holding.symbol }}</td>
+    <td>{{ holding.targetAllocation | percent }}</td>
+    <td><input type="checkbox" [checked]="holding.sellToBalance" disabled></td>
+    <td>{{ holding.quantity }}</td>
+    <td>{{ holding.price | currency }}</td>
+    <td>{{ holding.amount | currency }}</td>
+    <td><span [ngClass]="{'buy': holding.distanceToTargetAllocation < 0,
+                    'sell': holding.distanceToTargetAllocation > 0}">
+      {{ holding.distanceToTargetAllocation | percent:'1.2-3' }}
+    </span></td>
+    <td *ngIf="editable"><input type="button" value="Edit/Remove" (click)="removeHolding(i)"></td>
+  </tr>
+
+  <tr *ngIf="editable">
+    <td><input #symbolInput type="text" formControlName="symbol"></td>
+    <td><input type="text" formControlName="targetAllocation"></td>
+    <td><input type="checkbox" formControlName="sellToBalance"></td>
+    <td><input #quantityInput type="text" formControlName="quantity"></td>
+    <td>{{ newHoldingPrice | currency}}</td>
+    <td>&mdash;</td>
+    <td>&mdash;</td>
+    <td><input type="submit" value="Add"></td>
+  </tr>
+
+</table>
+
+</form>
