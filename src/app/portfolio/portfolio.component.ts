@@ -4,6 +4,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {QuoteService} from './quote.service';
 import {ActivatedRoute, Params} from '@angular/router';
 import {SerializerService} from './serializer.service';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-portfolio',
@@ -23,10 +24,12 @@ export class PortfolioComponent implements OnInit {
 
   constructor(private quoteService: QuoteService,
               private serializerService: SerializerService,
-              private activatedRoute: ActivatedRoute) {
+              private activatedRoute: ActivatedRoute,
+              private location: Location) {
     this.activatedRoute.queryParams.subscribe(params =>
       this.updateHoldingsFromQueryParams(params)
     );
+    this.updatePermalink();
   }
 
   // tslint:disable-next-line:variable-name
@@ -34,8 +37,6 @@ export class PortfolioComponent implements OnInit {
 
   @Input()
   public editable: boolean;
-
-  permalink = '/balancingAct';
 
   newHoldingForm = new FormGroup({
     symbol: new FormControl('', {
@@ -74,7 +75,8 @@ export class PortfolioComponent implements OnInit {
   }
 
   updatePermalink() {
-    this.permalink = '/balancingAct?holdings=' + this.serializerService.serializeHoldings(this._holdings);
+    this.location.replaceState('/app',
+      'holdings=' + this.serializerService.serializeHoldings(this._holdings));
   }
 
   removeHolding(holdingIndex: number): void {
@@ -94,7 +96,7 @@ export class PortfolioComponent implements OnInit {
       this.newHoldingForm.get('sellToBalance').setValue(true);
       this.quantityInput.nativeElement.focus();
     }
-    this.quoteService.getQuote(symbol).subscribe((quote) => this.newHoldingPrice = quote);
+    this.quoteService.getQuote(symbol).subscribe((quote) => this.newHoldingPrice = quote.price);
   }
 
   private updateHoldingsFromQueryParams(params: Params) {
@@ -105,6 +107,8 @@ export class PortfolioComponent implements OnInit {
   }
 
   private updatePrices() {
-    this.holdings.forEach(h => this.quoteService.getQuote(h.symbol).subscribe(quote => h.price = quote));
+    Promise.all(this.holdings.map(h => this.quoteService.getQuote(h.symbol)
+      .toPromise().then(quote => h.price = quote.price)))
+      .then(_ => this.updatePermalink());
   }
 }

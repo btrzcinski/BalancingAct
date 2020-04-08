@@ -22,12 +22,12 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     RouterModule.forRoot(
       [
         {
-          path: 'balancingAct',
+          path: 'app',
           component: BalancingActComponent
         },
         {
           path: '',
-          redirectTo: '/balancingAct',
+          redirectTo: '/app',
           pathMatch: 'full'
         },
         {
