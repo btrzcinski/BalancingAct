@@ -9,8 +9,7 @@ import {Quote} from '../models/quote';
 })
 export class QuoteService {
 
-  serviceUrl = 'https://server.lan:8080/quote';
-  apiKey = '6V8W1GM8HTUJ8FK3';
+  serviceUrl = 'http://server.lan:8080/quote';
 
   constructor(private http: HttpClient) { }
 
