@@ -19,9 +19,7 @@ export class QuoteService {
     }
 
     if (symbol.toUpperCase() === 'CASH') {
-      return of<Quote>({symbol: 'CASH',
-      price: 1,
-      lastUpdated: 'Now'});
+      return of(new QuoteModel('CASH', 1));
     }
 
     // In development mode, return fixed prices for known test securities to avoid hitting the API so much.
