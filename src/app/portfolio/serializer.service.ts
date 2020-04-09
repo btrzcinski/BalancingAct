@@ -1,28 +1,44 @@
 import {Injectable} from '@angular/core';
-import {HoldingModel} from '../models/holding-model';
+import {Holding, HoldingModel} from '../models/holding';
+import {QuoteService} from './quote.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SerializerService {
 
-  constructor() { }
+  constructor(private quoteService: QuoteService) {
+  }
 
-  private clonePortfolio(portfolio: HoldingModel[], setPortfolioReference: boolean = true): HoldingModel[] {
-    const newPortfolio = new Array<HoldingModel>();
-    portfolio.forEach(
-      h => newPortfolio.push(
-        HoldingModel.createCopyFromModel(
-          setPortfolioReference ? newPortfolio : null, h)));
+  private stripPortfolio(portfolio: HoldingModel[]): Holding[] {
+    return portfolio.map(hm => {
+      return {
+        symbol: hm.symbol,
+        targetAllocation: hm.targetAllocation,
+        sellToBalance: hm.sellToBalance,
+        quantity: hm.quantity,
+      } as Holding;
+    });
+  }
 
-    return newPortfolio;
+  private createPortfolio(holdings: Holding[]): HoldingModel[] {
+    const portfolio = new Array<HoldingModel>();
+    holdings.forEach(h => portfolio.push(new HoldingModel(
+      portfolio,
+      h.symbol,
+      h.targetAllocation,
+      h.sellToBalance,
+      h.quantity,
+      this.quoteService.getQuote(h.symbol),
+    )));
+    return portfolio;
   }
 
   public serializeHoldings(holdings: HoldingModel[]): string {
-    return encodeURIComponent(btoa(JSON.stringify(this.clonePortfolio(holdings, false))));
+    return encodeURIComponent(btoa(JSON.stringify(this.stripPortfolio(holdings))));
   }
 
   public deserializeHoldings(holdings: string): HoldingModel[] {
-    return this.clonePortfolio(JSON.parse(atob(decodeURIComponent(holdings))));
+    return this.createPortfolio(JSON.parse(atob(decodeURIComponent(holdings))));
   }
 }

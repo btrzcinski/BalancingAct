@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Quote, QuoteModel} from '../models/quote';
 
@@ -9,37 +9,54 @@ import {Quote, QuoteModel} from '../models/quote';
 })
 export class QuoteService {
 
-  serviceUrl = 'http://server.lan:8080/quote';
+  private serviceUrl = 'http://server.lan:8080/quote';
+  private cache = new Map<string, BehaviorSubject<Quote>>();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
-  public getQuote(symbol: string): Observable<Quote> {
-    if (!symbol || symbol.length === 0) {
-      return null;
+  private supplyNextValue(symbol: string) {
+    if (symbol === 'CASH') {
+      return;
     }
 
-    if (symbol.toUpperCase() === 'CASH') {
-      return of(new QuoteModel('CASH', 1));
-    }
-
-    // In development mode, return fixed prices for known test securities to avoid hitting the API so much.
+    const subject = this.cache.get(symbol);
     if (!environment.production) {
       console.log(`QuoteService: Not running in production, using fake prices for '${symbol}'`);
       switch (symbol.toUpperCase()) {
         case 'BND':
-          return of(new QuoteModel('BND', 85.96));
+          subject.next(new QuoteModel('BND', 85.96));
+          break;
         case 'BNDX':
-          return of(new QuoteModel('BNDX', 56.15));
+          subject.next(new QuoteModel('BNDX', 56.15));
+          break;
         case 'VTI':
-          return of(new QuoteModel('VTI', 123.38));
+          subject.next(new QuoteModel('VTI', 123.38));
+          break;
         case 'VXUS':
-          return of(new QuoteModel('VXUS', 40.43));
+          subject.next(new QuoteModel('VXUS', 40.43));
+          break;
         default:
-          console.warn('Unknown test security used in development, will hit the API anyway');
+          console.warn('Unknown test security used in development, price not set');
       }
+    } else {
+      const quoteUrl = `${this.serviceUrl}/${symbol}`;
+      this.http.get<Quote>(quoteUrl, {responseType: 'json'})
+        .subscribe(quote => subject.next(quote));
+    }
+  }
+
+  public getQuote(symbol: string): BehaviorSubject<Quote> {
+    if (!symbol || symbol.length === 0) {
+      return null;
+    }
+    const normalSymbol = symbol.toUpperCase();
+
+    if (!this.cache.has(normalSymbol)) {
+      this.cache.set(normalSymbol, new BehaviorSubject<Quote>(new QuoteModel(normalSymbol, 1)));
     }
 
-    const quoteUrl = `${this.serviceUrl}/${symbol}`;
-    return this.http.get<Quote>(quoteUrl, {responseType: 'json'});
+    this.supplyNextValue(normalSymbol);
+    return this.cache.get(normalSymbol);
   }
 }

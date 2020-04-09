@@ -1,11 +1,11 @@
 <div>
   <ng-container
-    *ngIf="quote; then formattedQuote; else placeholderDash">
+    *ngIf="quote$ | async; then formattedQuote; else placeholderDash">
   </ng-container>
 
   <ng-template #formattedQuote>
-    {{ quote.price | currency }}<br/>
-    <span class="last-updated">as of {{ quote.lastUpdated | date:'short'}}</span>
+    {{ (quote$ | async).price | currency }}<br/>
+    <span class="last-updated">as of {{ (quote$ | async).lastUpdated | date:'short'}}</span>
   </ng-template>
 
   <ng-template #placeholderDash>

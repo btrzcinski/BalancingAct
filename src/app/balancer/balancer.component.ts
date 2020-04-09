@@ -1,5 +1,5 @@
 import {Component, DoCheck, Input, IterableDiffer, IterableDiffers, OnInit} from '@angular/core';
-import {HoldingModel} from '../models/holding-model';
+import {HoldingModel} from '../models/holding';
 import {BalancerService} from './balancer.service';
 
 @Component({

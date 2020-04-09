@@ -1,34 +1,26 @@
 import {Quote} from './quote';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 
-export class HoldingModel {
-  get quote(): Quote {
-    return this._quote;
-  }
+export interface Holding {
+  symbol: string;
+  targetAllocation: number;
+  sellToBalance: boolean;
+  quantity: number;
+}
 
-  set quote(value: Quote) {
-    this._quote = value;
-    this._quote$.next(value);
-  }
-
-  get quote$(): Observable<Quote> {
-    return this._quote$;
-  }
-
+export class HoldingModel implements Holding {
   constructor(
     private portfolio: HoldingModel[],
     public symbol: string,
     public targetAllocation: number,
     public sellToBalance: boolean,
     public quantity: number,
-    quote: Quote,
+    public quote$: BehaviorSubject<Quote>
   ) {
-    this._quote = quote;
-    this._quote$ = new BehaviorSubject<Quote>(this._quote);
   }
 
   get amount(): number {
-    return this.quantity * this._quote.price;
+    return this.quantity * this.price;
   }
 
   get currentAllocation(): number {
@@ -39,11 +31,15 @@ export class HoldingModel {
     return this.currentAllocation - this.targetAllocation;
   }
 
+  get price(): number {
+    return this.quote$.getValue().price;
+  }
+
   get isBalanced(): boolean {
     const proposedHoldingQuantity = this.quantity + (this.distanceToTargetAllocation < 0 ? 1 : -1);
     const currentAbsDistance = Math.abs(this.distanceToTargetAllocation);
     const proposedAbsDistance = Math.abs(
-      ((this._quote.price * proposedHoldingQuantity) / this.getPortfolioTotal()) - this.targetAllocation);
+      ((this.price * proposedHoldingQuantity) / this.getPortfolioTotal()) - this.targetAllocation);
     return proposedAbsDistance >= currentAbsDistance;
   }
 
@@ -51,20 +47,15 @@ export class HoldingModel {
     return this.symbol.toUpperCase() === 'CASH';
   }
 
-  // tslint:disable-next-line:variable-name
-  private _quote: Quote;
-
-  // tslint:disable-next-line:variable-name
-  private _quote$: BehaviorSubject<Quote>;
-
-  static createCopyFromModel(portfolio: HoldingModel[], holdingModel: HoldingModel) {
+  static createCopyFromModel(portfolio: HoldingModel[], holdingModel: HoldingModel,
+                             quote$?: BehaviorSubject<Quote>) {
     return new HoldingModel(
       portfolio,
       holdingModel.symbol,
       holdingModel.targetAllocation,
       holdingModel.sellToBalance,
       holdingModel.quantity,
-      holdingModel._quote
+      quote$ ? quote$ : holdingModel.quote$
     );
   }
 

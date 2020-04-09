@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {HoldingModel} from '../../models/holding-model';
+import {HoldingModel} from '../../models/holding';
 
 @Component({
   selector: 'balancer-transaction-plan',

@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Quote} from '../../models/quote';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'portfolio-quote',
@@ -9,7 +10,7 @@ import {Quote} from '../../models/quote';
 export class PortfolioQuoteComponent implements OnInit {
 
   @Input()
-  public quote: Quote;
+  public quote$: Observable<Quote>;
 
   constructor() {
   }

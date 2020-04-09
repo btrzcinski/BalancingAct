@@ -1,11 +1,12 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {HoldingModel} from '../models/holding-model';
+import {HoldingModel} from '../models/holding';
 import {FormControl, FormGroup} from '@angular/forms';
 import {QuoteService} from './quote.service';
 import {ActivatedRoute, Params} from '@angular/router';
 import {SerializerService} from './serializer.service';
 import {Location} from '@angular/common';
 import {Quote} from '../models/quote';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'app-portfolio',
@@ -44,7 +45,7 @@ export class PortfolioComponent implements OnInit {
     quantity: new FormControl(''),
   });
 
-  newHoldingQuote: Quote;
+  newHoldingQuote$: BehaviorSubject<Quote>;
 
   @ViewChild('symbolInput')
   symbolInput: ElementRef;
@@ -76,10 +77,10 @@ export class PortfolioComponent implements OnInit {
       targetAllocation,
       this.newHoldingForm.get('sellToBalance').value,
       +this.newHoldingForm.get('quantity').value,
-      this.newHoldingQuote,
+      this.newHoldingQuote$,
     ));
     this.newHoldingForm.reset();
-    this.newHoldingQuote = null;
+    this.newHoldingQuote$ = null;
     this.symbolInput.nativeElement.focus();
   }
 
@@ -105,7 +106,7 @@ export class PortfolioComponent implements OnInit {
       this.newHoldingForm.get('sellToBalance').setValue(true);
       this.quantityInput.nativeElement.focus();
     }
-    this.quoteService.getQuote(symbol)?.subscribe((quote) => this.newHoldingQuote = quote);
+    this.newHoldingQuote$ = this.quoteService.getQuote(symbol);
   }
 
   private updateHoldingsFromQueryParams(params: Params) {
@@ -116,8 +117,6 @@ export class PortfolioComponent implements OnInit {
   }
 
   private updatePrices() {
-    Promise.all(this.holdings.map(h => this.quoteService.getQuote(h.symbol)
-      .toPromise().then(quote => h.quote = quote)))
-      .then(_ => this.updatePermalink());
+    this.holdings.forEach(h => this.quoteService.getQuote(h.symbol));
   }
 }

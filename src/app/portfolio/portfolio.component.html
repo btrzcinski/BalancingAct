@@ -18,9 +18,7 @@
       <td><input type="checkbox" [checked]="holding.sellToBalance" disabled></td>
       <td>{{ holding.quantity }}</td>
       <td>
-        <ng-container *ngIf="holding.quote$ | async as quote">
-          <portfolio-quote [quote]="quote"></portfolio-quote>
-        </ng-container>
+        <portfolio-quote [quote$]="holding.quote$"></portfolio-quote>
       </td>
       <td>{{ holding.amount | currency }}</td>
       <td><span [ngClass]="{'buy': holding.distanceToTargetAllocation < 0,
@@ -37,7 +35,7 @@
     <td><input type="checkbox" formControlName="sellToBalance"></td>
     <td><input #quantityInput type="text" formControlName="quantity"></td>
     <td>
-      <portfolio-quote [quote]="newHoldingQuote"></portfolio-quote>
+      <portfolio-quote [quote$]="newHoldingQuote$"></portfolio-quote>
     </td>
     <td>&mdash;</td>
     <td>&mdash;</td>
