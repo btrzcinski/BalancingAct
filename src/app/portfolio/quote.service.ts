@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {environment} from '../../environments/environment';
-import {Quote} from '../models/quote';
+import {Quote, QuoteModel} from '../models/quote';
 
 @Injectable({
   providedIn: 'root'
@@ -29,13 +29,13 @@ export class QuoteService {
       console.log(`QuoteService: Not running in production, using fake prices for '${symbol}'`);
       switch (symbol.toUpperCase()) {
         case 'BND':
-          return of<Quote>({symbol: 'BND', price: 85.96, lastUpdated: 'DevMode'});
+          return of(new QuoteModel('BND', 85.96));
         case 'BNDX':
-          return of<Quote>({symbol: 'BNDX', price: 56.15, lastUpdated: 'DevMode'});
+          return of(new QuoteModel('BNDX', 56.15));
         case 'VTI':
-          return of<Quote>({symbol: 'VTI', price: 123.38, lastUpdated: 'DevMode'});
+          return of(new QuoteModel('VTI', 123.38));
         case 'VXUS':
-          return of<Quote>({symbol: 'VXUS', price: 40.43, lastUpdated: 'DevMode'});
+          return of(new QuoteModel('VXUS', 40.43));
         default:
           console.warn('Unknown test security used in development, will hit the API anyway');
       }
