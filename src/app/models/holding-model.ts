@@ -1,15 +1,40 @@
+import {Quote} from './quote';
+import {BehaviorSubject, Observable} from 'rxjs';
+
 export class HoldingModel {
+  get quote(): Quote {
+    return this._quote;
+  }
+
+  set quote(value: Quote) {
+    this._quote = value;
+    this._quote$.next(value);
+  }
+
+  get quote$(): Observable<Quote> {
+    return this._quote$;
+  }
+
+  // tslint:disable-next-line:variable-name
+  private _quote: Quote;
+
   constructor(
     private portfolio: HoldingModel[],
     public symbol: string,
     public targetAllocation: number,
     public sellToBalance: boolean,
     public quantity: number,
-    public price: number
-  ) {}
+    quote: Quote,
+  ) {
+    this._quote = quote;
+    this._quote$ = new BehaviorSubject<Quote>(this._quote);
+  }
+
+  // tslint:disable-next-line:variable-name
+  private _quote$: BehaviorSubject<Quote>;
 
   get amount(): number {
-    return this.quantity * this.price;
+    return this.quantity * this._quote.price;
   }
 
   get currentAllocation(): number {
@@ -24,7 +49,7 @@ export class HoldingModel {
     const proposedHoldingQuantity = this.quantity + (this.distanceToTargetAllocation < 0 ? 1 : -1);
     const currentAbsDistance = Math.abs(this.distanceToTargetAllocation);
     const proposedAbsDistance = Math.abs(
-      ((this.price * proposedHoldingQuantity) / this.getPortfolioTotal()) - this.targetAllocation);
+      ((this._quote.price * proposedHoldingQuantity) / this.getPortfolioTotal()) - this.targetAllocation);
     return proposedAbsDistance >= currentAbsDistance;
   }
 

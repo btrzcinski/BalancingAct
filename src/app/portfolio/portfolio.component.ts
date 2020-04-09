@@ -5,6 +5,7 @@ import {QuoteService} from './quote.service';
 import {ActivatedRoute, Params} from '@angular/router';
 import {SerializerService} from './serializer.service';
 import {Location} from '@angular/common';
+import {Quote} from '../models/quote';
 
 @Component({
   selector: 'app-portfolio',
@@ -47,7 +48,7 @@ export class PortfolioComponent implements OnInit {
     quantity: new FormControl(''),
   });
 
-  newHoldingPrice = 0;
+  newHoldingQuote: Quote;
 
   @ViewChild('symbolInput')
   symbolInput: ElementRef;
@@ -61,13 +62,14 @@ export class PortfolioComponent implements OnInit {
   }
 
   addHolding(): void {
+    const symbol = this.newHoldingForm.get('symbol').value.toUpperCase();
     this._holdings.push(new HoldingModel(
       this._holdings,
-      this.newHoldingForm.get('symbol').value.toUpperCase(),
+      symbol,
       +this.newHoldingForm.get('targetAllocation').value * .01,
       this.newHoldingForm.get('sellToBalance').value,
       +this.newHoldingForm.get('quantity').value,
-      this.newHoldingPrice,
+      this.newHoldingQuote,
     ));
     this.updatePermalink();
     this.newHoldingForm.reset();
@@ -96,7 +98,7 @@ export class PortfolioComponent implements OnInit {
       this.newHoldingForm.get('sellToBalance').setValue(true);
       this.quantityInput.nativeElement.focus();
     }
-    this.quoteService.getQuote(symbol).subscribe((quote) => this.newHoldingPrice = quote.price);
+    this.quoteService.getQuote(symbol)?.subscribe((quote) => this.newHoldingQuote = quote);
   }
 
   private updateHoldingsFromQueryParams(params: Params) {
@@ -108,7 +110,7 @@ export class PortfolioComponent implements OnInit {
 
   private updatePrices() {
     Promise.all(this.holdings.map(h => this.quoteService.getQuote(h.symbol)
-      .toPromise().then(quote => h.price = quote.price)))
+      .toPromise().then(quote => h.quote = quote)))
       .then(_ => this.updatePermalink());
   }
 }

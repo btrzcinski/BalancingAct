@@ -1,0 +1,14 @@
+<div>
+  <ng-container
+    *ngIf="quote; then formattedQuote; else placeholderDash">
+  </ng-container>
+
+  <ng-template #formattedQuote>
+    {{ quote.price | currency }}<br/>
+    <span class="last-updated">as of {{ quote.lastUpdated }}</span>
+  </ng-template>
+
+  <ng-template #placeholderDash>
+    &mdash;
+  </ng-template>
+</div>

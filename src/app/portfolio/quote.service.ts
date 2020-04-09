@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {environment} from '../../environments/environment';
@@ -28,11 +28,16 @@ export class QuoteService {
     if (!environment.production) {
       console.log(`QuoteService: Not running in production, using fake prices for '${symbol}'`);
       switch (symbol.toUpperCase()) {
-        case 'BND': return of<Quote>({symbol: 'BND', price: 85.96, lastUpdated: 'Now'});
-        case 'BNDX': return of<Quote>({symbol: 'BNDX', price: 56.15, lastUpdated: 'Now'});
-        case 'VTI': return of<Quote>({symbol: 'VTI', price: 123.38, lastUpdated: 'Now'});
-        case 'VXUS': return of<Quote>({symbol: 'VXUS', price: 40.43, lastUpdated: 'Now'});
-        default: console.warn('Unknown test security used in development, will hit the API anyway');
+        case 'BND':
+          return of<Quote>({symbol: 'BND', price: 85.96, lastUpdated: 'DevMode'});
+        case 'BNDX':
+          return of<Quote>({symbol: 'BNDX', price: 56.15, lastUpdated: 'DevMode'});
+        case 'VTI':
+          return of<Quote>({symbol: 'VTI', price: 123.38, lastUpdated: 'DevMode'});
+        case 'VXUS':
+          return of<Quote>({symbol: 'VXUS', price: 40.43, lastUpdated: 'DevMode'});
+        default:
+          console.warn('Unknown test security used in development, will hit the API anyway');
       }
     }
 

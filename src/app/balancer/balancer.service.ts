@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HoldingModel} from '../models/holding-model';
+import {QuoteModel} from '../models/quote';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class BalancerService {
       h.targetAllocation,
       h.sellToBalance,
       h.quantity,
-      h.price
+      h.quote,
     )));
     return newPortfolio;
   }
@@ -27,7 +28,8 @@ export class BalancerService {
     // Find the cash holding, or create one
     let cash = newPortfolio.find(h => h.isCash);
     if (!cash) {
-      cash = new HoldingModel(newPortfolio, 'CASH', 0, true, 0, 1);
+      cash = new HoldingModel(newPortfolio, 'CASH', 0, true, 0,
+        new QuoteModel('CASH', 1));
     }
 
     const shouldSellHoldingToBalance: (h: HoldingModel) => boolean =
@@ -38,7 +40,7 @@ export class BalancerService {
       .forEach(h => {
         while (!h.isBalanced) {
           h.quantity--;
-          cash.quantity += h.price;
+          cash.quantity += h.quote.price;
         }
       });
 
@@ -48,13 +50,13 @@ export class BalancerService {
     //   - If there isn't enough cash available, drop that security and try the next one
     //   - If no more securities are left, we're done
     const shouldBuyHoldingToBalance: (h: HoldingModel) => boolean =
-      h => !h.isCash && h.distanceToTargetAllocation < 0 && h.price <= cash.quantity && !h.isBalanced;
+      h => !h.isCash && h.distanceToTargetAllocation < 0 && h.quote.price <= cash.quantity && !h.isBalanced;
     while (newPortfolio.some(shouldBuyHoldingToBalance)) {
       const holdingToBuy = newPortfolio.filter(shouldBuyHoldingToBalance)
         .sort((a, b) => b.distanceToTargetAllocation - a.distanceToTargetAllocation)
         .pop();
       holdingToBuy.quantity++;
-      cash.quantity = +(cash.quantity - holdingToBuy.price).toFixed(2);
+      cash.quantity = +(cash.quantity - holdingToBuy.quote.price).toFixed(2);
     }
 
     return newPortfolio;

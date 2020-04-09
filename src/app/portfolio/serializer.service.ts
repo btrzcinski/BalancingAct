@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HoldingModel} from '../models/holding-model';
 
 @Injectable({
@@ -16,7 +16,7 @@ export class SerializerService {
       h.targetAllocation,
       h.sellToBalance,
       h.quantity,
-      h.price
+      h.quote,
     )));
     return newPortfolio;
   }
