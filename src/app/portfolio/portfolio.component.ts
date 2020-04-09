@@ -27,10 +27,6 @@ export class PortfolioComponent implements OnInit {
               private serializerService: SerializerService,
               private activatedRoute: ActivatedRoute,
               private location: Location) {
-    this.activatedRoute.queryParams.subscribe(params =>
-      this.updateHoldingsFromQueryParams(params)
-    );
-    this.updatePermalink();
   }
 
   // tslint:disable-next-line:variable-name
@@ -59,6 +55,12 @@ export class PortfolioComponent implements OnInit {
   ngOnInit(): void {
     this.newHoldingForm.get('symbol').valueChanges.subscribe(
       (symbol) => this.updateFormFromSymbol(symbol));
+    if (this.editable) {
+      this.activatedRoute.queryParams.subscribe(params =>
+        this.updateHoldingsFromQueryParams(params)
+      );
+      this.updatePermalink();
+    }
   }
 
   addHolding(): void {
@@ -76,7 +78,6 @@ export class PortfolioComponent implements OnInit {
       +this.newHoldingForm.get('quantity').value,
       this.newHoldingQuote,
     ));
-    this.updatePermalink();
     this.newHoldingForm.reset();
     this.newHoldingQuote = null;
     this.symbolInput.nativeElement.focus();

@@ -15,9 +15,6 @@ export class HoldingModel {
     return this._quote$;
   }
 
-  // tslint:disable-next-line:variable-name
-  private _quote: Quote;
-
   constructor(
     private portfolio: HoldingModel[],
     public symbol: string,
@@ -29,9 +26,6 @@ export class HoldingModel {
     this._quote = quote;
     this._quote$ = new BehaviorSubject<Quote>(this._quote);
   }
-
-  // tslint:disable-next-line:variable-name
-  private _quote$: BehaviorSubject<Quote>;
 
   get amount(): number {
     return this.quantity * this._quote.price;
@@ -55,6 +49,23 @@ export class HoldingModel {
 
   get isCash(): boolean {
     return this.symbol.toUpperCase() === 'CASH';
+  }
+
+  // tslint:disable-next-line:variable-name
+  private _quote: Quote;
+
+  // tslint:disable-next-line:variable-name
+  private _quote$: BehaviorSubject<Quote>;
+
+  static createCopyFromModel(portfolio: HoldingModel[], holdingModel: HoldingModel) {
+    return new HoldingModel(
+      portfolio,
+      holdingModel.symbol,
+      holdingModel.targetAllocation,
+      holdingModel.sellToBalance,
+      holdingModel.quantity,
+      holdingModel._quote
+    );
   }
 
   private getPortfolioTotal(): number {

@@ -11,14 +11,9 @@ export class BalancerService {
 
   private clonePortfolio(portfolio: HoldingModel[]): HoldingModel[] {
     const newPortfolio = new Array<HoldingModel>();
-    portfolio.forEach(h => newPortfolio.push(new HoldingModel(
-      newPortfolio,
-      h.symbol,
-      h.targetAllocation,
-      h.sellToBalance,
-      h.quantity,
-      h.quote,
-    )));
+    portfolio.forEach(
+      h => newPortfolio.push(
+        HoldingModel.createCopyFromModel(newPortfolio, h)));
     return newPortfolio;
   }
 

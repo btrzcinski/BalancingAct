@@ -10,14 +10,11 @@ export class SerializerService {
 
   private clonePortfolio(portfolio: HoldingModel[], setPortfolioReference: boolean = true): HoldingModel[] {
     const newPortfolio = new Array<HoldingModel>();
-    portfolio.forEach(h => newPortfolio.push(new HoldingModel(
-      (setPortfolioReference ? newPortfolio : null),
-      h.symbol,
-      h.targetAllocation,
-      h.sellToBalance,
-      h.quantity,
-      h.quote,
-    )));
+    portfolio.forEach(
+      h => newPortfolio.push(
+        HoldingModel.createCopyFromModel(
+          setPortfolioReference ? newPortfolio : null, h)));
+
     return newPortfolio;
   }
 

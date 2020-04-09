@@ -38,6 +38,7 @@ export class BalancerComponent implements OnInit, DoCheck {
   }
 
   ngOnInit(): void {
+    this.updateBalancedPortfolio();
   }
 
 }
