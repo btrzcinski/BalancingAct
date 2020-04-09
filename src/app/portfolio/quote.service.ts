@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, interval, Observable, of} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Quote, QuoteModel} from '../models/quote';
+import {switchMap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -15,35 +16,46 @@ export class QuoteService {
   constructor(private http: HttpClient) {
   }
 
+  private getNextQuote(symbol: string): Observable<Quote> {
+    if (symbol === 'CASH') {
+      return;
+    }
+
+    if (!environment.production) {
+      console.log(`QuoteService: Not running in production, using fake prices for '${symbol}'`);
+      switch (symbol.toUpperCase()) {
+        case 'BND':
+          return of(new QuoteModel('BND', 85.96));
+        case 'BNDX':
+          return of(new QuoteModel('BNDX', 56.15));
+        case 'VTI':
+          return of(new QuoteModel('VTI', 123.38));
+        case 'VXUS':
+          return of(new QuoteModel('VXUS', 40.43));
+        default:
+          console.warn('Unknown test security used in development, price not set');
+      }
+    }
+
+    const quoteUrl = `${this.serviceUrl}/${symbol}`;
+    return this.http.get<Quote>(quoteUrl, {responseType: 'json'});
+  }
+
   private supplyNextValue(symbol: string) {
     if (symbol === 'CASH') {
       return;
     }
 
     const subject = this.cache.get(symbol);
-    if (!environment.production) {
-      console.log(`QuoteService: Not running in production, using fake prices for '${symbol}'`);
-      switch (symbol.toUpperCase()) {
-        case 'BND':
-          subject.next(new QuoteModel('BND', 85.96));
-          break;
-        case 'BNDX':
-          subject.next(new QuoteModel('BNDX', 56.15));
-          break;
-        case 'VTI':
-          subject.next(new QuoteModel('VTI', 123.38));
-          break;
-        case 'VXUS':
-          subject.next(new QuoteModel('VXUS', 40.43));
-          break;
-        default:
-          console.warn('Unknown test security used in development, price not set');
-      }
-    } else {
-      const quoteUrl = `${this.serviceUrl}/${symbol}`;
-      this.http.get<Quote>(quoteUrl, {responseType: 'json'})
-        .subscribe(quote => subject.next(quote));
-    }
+    this.getNextQuote(symbol)
+      .subscribe(q => subject.next(q));
+  }
+
+  private setupRefreshInterval(symbol: string): void {
+    const subject = this.cache.get(symbol);
+    interval(60 * 1000)
+      .pipe(switchMap(_ => this.getNextQuote(symbol)))
+      .subscribe(q => subject.next(q));
   }
 
   public getQuote(symbol: string): BehaviorSubject<Quote> {
@@ -54,9 +66,10 @@ export class QuoteService {
 
     if (!this.cache.has(normalSymbol)) {
       this.cache.set(normalSymbol, new BehaviorSubject<Quote>(new QuoteModel(normalSymbol, 1)));
+      this.supplyNextValue(normalSymbol);
+      this.setupRefreshInterval(normalSymbol);
     }
 
-    this.supplyNextValue(normalSymbol);
     return this.cache.get(normalSymbol);
   }
 }
