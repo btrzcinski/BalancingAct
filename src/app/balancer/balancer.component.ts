@@ -17,6 +17,7 @@ export class BalancerComponent implements OnInit, DoCheck {
     this.arrayDiffer = differs.find([]).create();
   }
 
+  showBalancePlan = false;
   totalTargetAllocation = 0;
 
   ngDoCheck(): void {
@@ -28,8 +29,11 @@ export class BalancerComponent implements OnInit, DoCheck {
   private updateBalancedPortfolio() {
     this.totalTargetAllocation = this.holdings.map(h => h.targetAllocation)
       .reduce((p, v) => p + v, 0);
-    if (this.totalTargetAllocation === 1) {
+    if (Math.abs(1 - this.totalTargetAllocation) < Number.EPSILON) {
+      this.showBalancePlan = true;
       this.balancedHoldings = this.balancer.createBalancePlan(this.holdings);
+    } else {
+      this.showBalancePlan = false;
     }
   }
 

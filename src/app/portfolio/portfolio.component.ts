@@ -62,17 +62,23 @@ export class PortfolioComponent implements OnInit {
   }
 
   addHolding(): void {
-    const symbol = this.newHoldingForm.get('symbol').value.toUpperCase();
-    this._holdings.push(new HoldingModel(
+    const targetAllocation = +this.newHoldingForm.get('targetAllocation').value * .01;
+    let spliceIndex = this._holdings.findIndex(h => h.targetAllocation < targetAllocation);
+    if (spliceIndex < 0) {
+      spliceIndex = this._holdings.length;
+    }
+
+    this._holdings.splice(spliceIndex, 0, new HoldingModel(
       this._holdings,
-      symbol,
-      +this.newHoldingForm.get('targetAllocation').value * .01,
+      this.newHoldingForm.get('symbol').value.toUpperCase(),
+      targetAllocation,
       this.newHoldingForm.get('sellToBalance').value,
       +this.newHoldingForm.get('quantity').value,
       this.newHoldingQuote,
     ));
     this.updatePermalink();
     this.newHoldingForm.reset();
+    this.newHoldingQuote = null;
     this.symbolInput.nativeElement.focus();
   }
 
