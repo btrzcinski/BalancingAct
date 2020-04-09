@@ -60,7 +60,6 @@ export class PortfolioComponent implements OnInit {
       this.activatedRoute.queryParams.subscribe(params =>
         this.updateHoldingsFromQueryParams(params)
       );
-      this.updatePermalink();
     }
   }
 
@@ -85,8 +84,10 @@ export class PortfolioComponent implements OnInit {
   }
 
   updatePermalink() {
-    this.location.replaceState('/app',
-      'holdings=' + this.serializerService.serializeHoldings(this._holdings));
+    if (this.editable) {
+      this.location.replaceState('/app',
+        'holdings=' + this.serializerService.serializeHoldings(this._holdings));
+    }
   }
 
   removeHolding(holdingIndex: number): void {

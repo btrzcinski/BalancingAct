@@ -1,6 +1,9 @@
 import {Component, DoCheck, Input, IterableDiffer, IterableDiffers, OnInit} from '@angular/core';
 import {HoldingModel} from '../models/holding';
 import {BalancerService} from './balancer.service';
+import {fromArray} from 'rxjs/internal/observable/fromArray';
+import {mergeAll} from 'rxjs/operators';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-balancer',
@@ -19,11 +22,25 @@ export class BalancerComponent implements OnInit, DoCheck {
 
   showBalancePlan = false;
   totalTargetAllocation = 0;
+  private portfolioUpdateSubscription: Subscription;
 
   ngDoCheck(): void {
     if (this.arrayDiffer.diff(this.holdings)) {
-      this.updateBalancedPortfolio();
+      this.onNewArray();
     }
+  }
+
+  private onNewArray(): void {
+    if (this.portfolioUpdateSubscription) {
+      this.portfolioUpdateSubscription.unsubscribe();
+    }
+
+    this.portfolioUpdateSubscription =
+      fromArray(this.holdings.map(h => h.quote$))
+        .pipe(mergeAll())
+        .subscribe(_ => this.updateBalancedPortfolio());
+
+    this.updateBalancedPortfolio();
   }
 
   private updateBalancedPortfolio() {

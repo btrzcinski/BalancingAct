@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, interval, Observable, of} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Quote, QuoteModel} from '../models/quote';
-import {switchMap} from 'rxjs/operators';
+import {first, switchMap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,7 @@ export class QuoteService {
     }
 
     const quoteUrl = `${this.serviceUrl}/${symbol}`;
-    return this.http.get<Quote>(quoteUrl, {responseType: 'json'});
+    return this.http.get<Quote>(quoteUrl, {responseType: 'json'}).pipe(first());
   }
 
   private supplyNextValue(symbol: string) {
@@ -47,15 +47,17 @@ export class QuoteService {
     }
 
     const subject = this.cache.get(symbol);
-    this.getNextQuote(symbol)
-      .subscribe(q => subject.next(q));
+    const nextQuote = this.getNextQuote(symbol);
+    // nextQuote.subscribe(subject);
+    nextQuote.subscribe(q => subject.next(q));
   }
 
   private setupRefreshInterval(symbol: string): void {
     const subject = this.cache.get(symbol);
-    interval(60 * 1000)
-      .pipe(switchMap(_ => this.getNextQuote(symbol)))
-      .subscribe(q => subject.next(q));
+    const refreshInterval = interval(60 * 1000)
+      .pipe(switchMap(_ => this.getNextQuote(symbol)));
+    // refreshInterval.subscribe(subject);
+    refreshInterval.subscribe(q => subject.next(q));
   }
 
   public getQuote(symbol: string): BehaviorSubject<Quote> {
