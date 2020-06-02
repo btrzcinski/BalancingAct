@@ -20,6 +20,8 @@ echo
 container=$(buildah from nginx)
 buildah run $container -- sh -c 'rm -r /usr/share/nginx/html/*'
 buildah copy $container dist/BalancingAct /usr/share/nginx/html
+buildah run $container -- sh -c 'rm /etc/nginx/conf.d/default.conf'
+buildah copy $container balancing-act.nginx.conf /etc/nginx/conf.d/balancing-act.conf
 buildah unmount $container
 buildah commit $container balancing-act
 buildah rm $container
