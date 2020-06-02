@@ -80,6 +80,7 @@ export class PortfolioComponent implements OnInit {
     ));
     this.newHoldingForm.reset();
     this.newHoldingQuote$ = null;
+    this.updatePermalink();
     this.symbolInput.nativeElement.focus();
   }
 

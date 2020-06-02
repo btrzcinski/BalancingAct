@@ -10,7 +10,7 @@ import {first, switchMap} from 'rxjs/operators';
 })
 export class QuoteService {
 
-  private serviceUrl = 'http://server.lan:8080/quote';
+  private serviceUrl = '/api/quote';
   private cache = new Map<string, BehaviorSubject<Quote>>();
 
   constructor(private http: HttpClient) {
