@@ -29,6 +29,17 @@
     </tr>
   </ng-container>
 
+  <tr class="subtotal-row">
+    <td><em>Subtotal</em></td>
+    <td>{{ subtotalRow.targetAllocation | percent }}</td>
+    <td>&mdash;</td>
+    <td>&mdash;</td>
+    <td>&mdash;</td>
+    <td>{{ subtotalRow.amount | currency }}</td>
+    <td>&mdash;</td>
+    <td *ngIf="editable">&mdash;</td>
+  </tr>
+
   <tr *ngIf="editable">
     <td><input #symbolInput type="text" formControlName="symbol"></td>
     <td><input type="text" formControlName="targetAllocation"></td>

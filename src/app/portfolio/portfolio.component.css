@@ -27,3 +27,6 @@ tr.odd-row {
   background-color: #def1ff;
 }
 
+tr.subtotal-row {
+  background-color: #eeeeee;
+}

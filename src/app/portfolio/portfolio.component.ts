@@ -7,6 +7,12 @@ import {SerializerService} from './serializer.service';
 import {Location} from '@angular/common';
 import {Quote} from '../models/quote';
 import {BehaviorSubject} from 'rxjs';
+import {sumOnProperty} from '../utils';
+
+interface SubtotalRow {
+  targetAllocation: number;
+  amount: number;
+}
 
 @Component({
   selector: 'app-portfolio',
@@ -22,6 +28,7 @@ export class PortfolioComponent implements OnInit {
   set holdings(value: HoldingModel[]) {
     this._holdings = value;
     this.updatePermalink();
+    this.updateSubtotal();
   }
 
   constructor(private quoteService: QuoteService,
@@ -52,6 +59,8 @@ export class PortfolioComponent implements OnInit {
 
   @ViewChild('quantityInput')
   quantityInput: ElementRef;
+
+  subtotalRow: SubtotalRow;
 
   ngOnInit(): void {
     this.newHoldingForm.get('symbol').valueChanges.subscribe(
@@ -120,5 +129,12 @@ export class PortfolioComponent implements OnInit {
 
   private updatePrices() {
     this.holdings.forEach(h => this.quoteService.getQuote(h.symbol));
+  }
+
+  private updateSubtotal() {
+    this.subtotalRow = {
+      targetAllocation: sumOnProperty(this._holdings, 'targetAllocation'),
+      amount: sumOnProperty(this._holdings, 'amount')
+    };
   }
 }
