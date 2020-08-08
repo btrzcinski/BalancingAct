@@ -5,7 +5,7 @@
 
   <ng-template #formattedQuote>
     {{ (quote$ | async).price | currency }}<br/>
-    <span class="last-updated">as of {{ (quote$ | async).lastUpdated | date:'short'}}</span>
+    <span class="last-updated">as of {{ (quote$ | async).lastUpdated | date: 'short': nycTz }} (NYC)</span>
   </ng-template>
 
   <ng-template #placeholderDash>
