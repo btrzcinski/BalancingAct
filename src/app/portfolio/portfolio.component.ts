@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, DoCheck, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {HoldingModel} from '../models/holding';
 import {FormControl, FormGroup} from '@angular/forms';
 import {QuoteService} from './quote.service';
@@ -19,7 +19,7 @@ interface SubtotalRow {
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.css']
 })
-export class PortfolioComponent implements OnInit, OnChanges {
+export class PortfolioComponent implements OnInit, DoCheck {
   get holdings(): HoldingModel[] {
     return this._holdings;
   }
@@ -72,12 +72,8 @@ export class PortfolioComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    for (const prop in changes) {
-      if (prop === 'holdings') {
-        this.updateSubtotal();
-      }
-    }
+  ngDoCheck() {
+    this.updateSubtotal();
   }
 
   addHolding(): void {
