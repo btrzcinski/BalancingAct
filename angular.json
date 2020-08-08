@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "BalancingAct"
+    }
+  },
+  "defaultProject": "BalancingAct",
+  "cli": {
+    "analytics": "e34af135-c4d6-4309-964f-ce5395c31c42"
+  }
 }
