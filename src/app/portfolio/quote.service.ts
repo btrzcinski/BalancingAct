@@ -37,7 +37,6 @@ export class QuoteService {
 
     const subject = this.cache.get(symbol);
     const nextQuote = this.getNextQuote(symbol);
-    // nextQuote.subscribe(subject);
     nextQuote.subscribe(q => subject.next(q));
   }
 
@@ -45,7 +44,6 @@ export class QuoteService {
     const subject = this.cache.get(symbol);
     const refreshInterval = interval(60 * 1000)
       .pipe(switchMap(_ => this.getNextQuote(symbol)));
-    // refreshInterval.subscribe(subject);
     refreshInterval.subscribe(q => subject.next(q));
   }
 
