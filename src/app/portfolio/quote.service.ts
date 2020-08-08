@@ -22,19 +22,8 @@ export class QuoteService {
     }
 
     if (!environment.production) {
-      console.log(`QuoteService: Not running in production, using fake prices for '${symbol}'`);
-      switch (symbol.toUpperCase()) {
-        case 'BND':
-          return of(new QuoteModel('BND', 85.96));
-        case 'BNDX':
-          return of(new QuoteModel('BNDX', 56.15));
-        case 'VTI':
-          return of(new QuoteModel('VTI', 123.38));
-        case 'VXUS':
-          return of(new QuoteModel('VXUS', 40.43));
-        default:
-          console.warn('Unknown test security used in development, price not set');
-      }
+      console.log(`QuoteService: Not running in production, using $1.00 price for '${symbol}'`);
+      return of(new QuoteModel(symbol.toUpperCase(), 1));
     }
 
     const quoteUrl = `${this.serviceUrl}/${symbol}`;
